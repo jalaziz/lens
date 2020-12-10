@@ -29,7 +29,7 @@ export class BottomBar extends React.Component {
 
     return (
       <div className="extensions box grow flex gaps justify-flex-end">
-        {_.map(statusBarRegistry.getItems(), (registration, index) => {
+        {_.map(items, (registration, index) => {
           if (!registration?.item && !registration?.components?.Item) {
             return;
           }
