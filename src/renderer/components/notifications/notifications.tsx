@@ -78,14 +78,14 @@ export class Notifications extends React.Component {
           return (
             <Animate key={id}>
               <div
-                className={cssNames("notification flex align-center", status)}
+                className={cssNames("notification flex", status)}
                 onMouseLeave={() => addAutoHideTimer(id)}
                 onMouseEnter={() => removeAutoHideTimer(id)}>
-                <div className="box center">
+                <div className="box">
                   <Icon material="info_outline"/>
                 </div>
                 <div className="message box grow">{msgText}</div>
-                <div className="box center">
+                <div className="box">
                   <Icon
                     material="close" className="close"
                     onClick={prevDefault(() => {
