@@ -28,8 +28,8 @@ export abstract class ItemStore<T extends ItemObject = ItemObject> {
   }
 
   @action
-  protected sortItems(items: T[] = this.items, sorting?: ((item: T) => any)[], order?: "asc" | "desc"): T[] {
-    return orderBy(items, sorting || this.defaultSorting, order);
+  protected sortItems(items: T[] = this.items, sorting: ((item: T) => any)[] = [this.defaultSorting], order?: "asc" | "desc"): T[] {
+    return orderBy(items, sorting, order);
   }
 
   protected async createItem(...args: any[]): Promise<any>;

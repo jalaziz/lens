@@ -346,27 +346,17 @@ export class Pod extends WorkloadKubeObject {
     if (this.getReason() === PodStatus.EVICTED) return "Evicted";
     if (this.getStatus() === PodStatus.RUNNING && this.metadata.deletionTimestamp) return "Terminating";
 
-    let message = "";
     const statuses = this.getContainerStatuses(false); // not including initContainers
 
-    if (statuses.length) {
-      statuses.forEach(status => {
-        const { state } = status;
+    for (const { state } of statuses.reverse()) {
+      if (state.waiting) {
+        return state.waiting.reason || "Waiting";
+      }
 
-        if (state.waiting) {
-          const { reason } = state.waiting;
-
-          message = reason ? reason : "Waiting";
-        }
-
-        if (state.terminated) {
-          const { reason } = state.terminated;
-
-          message = reason ? reason : "Terminated";
-        }
-      });
+      if (state.terminated) {
+        return state.terminated.reason || "Waiting";
+      }
     }
-    if (message) return message;
 
     return this.getStatusPhase();
   }
@@ -477,10 +467,7 @@ export class Pod extends WorkloadKubeObject {
   }
 
   getSelectedNodeOs() {
-    if (!this.spec.nodeSelector) return;
-    if (!this.spec.nodeSelector["kubernetes.io/os"] && !this.spec.nodeSelector["beta.kubernetes.io/os"]) return;
-
-    return this.spec.nodeSelector["kubernetes.io/os"] || this.spec.nodeSelector["beta.kubernetes.io/os"];
+    return this.spec.nodeSelector?.["kubernetes.io/os"] || this.spec.nodeSelector?.["beta.kubernetes.io/os"];
   }
 }
 

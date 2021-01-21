@@ -7,7 +7,7 @@ import logger from "../../main/logger";
 import { apiManager } from "./api-manager";
 import { apiKube } from "./index";
 import { createKubeApiURL, parseKubeApi } from "./kube-api-parse";
-import { KubeJsonApi, KubeJsonApiData, KubeJsonApiDataList } from "./kube-json-api";
+import { KubeJsonApi, KubeJsonApiData } from "./kube-json-api";
 import { IKubeObjectConstructor, KubeObject } from "./kube-object";
 import { kubeWatchApi } from "./kube-watch-api";
 
@@ -268,19 +268,11 @@ export class KubeApi<T extends KubeObject = any> {
     return query;
   }
 
-  protected parseResponse(data: KubeJsonApiData | KubeJsonApiData[] | KubeJsonApiDataList, namespace?: string): any {
+  protected parseResponse(data: unknown, namespace?: string): T | T[] | null {
     const KubeObjectConstructor = this.objectConstructor;
 
-    if (KubeObject.isJsonApiData(data)) {
-      const object = new KubeObjectConstructor(data);
-
-      ensureObjectSelfLink(this, object);
-
-      return object;
-    }
-
-    // process items list response
-    if (KubeObject.isJsonApiDataList(data)) {
+    // process items list response, check before single item since there is overlap
+    if (KubeObject.isJsonApiDataList(data, KubeObject.isPartialJsonApiData)) {
       const { apiVersion, items, metadata } = data;
 
       this.setResourceVersion(namespace, metadata.resourceVersion);
@@ -299,55 +291,85 @@ export class KubeApi<T extends KubeObject = any> {
       });
     }
 
+    // process a single item
+    if (KubeObject.isJsonApiData(data)) {
+      const object = new KubeObjectConstructor(data);
+
+      ensureObjectSelfLink(this, object);
+
+      return object;
+    }
+
     // custom apis might return array for list response, e.g. users, groups, etc.
     if (Array.isArray(data)) {
       return data.map(data => new KubeObjectConstructor(data));
     }
 
-    return data;
+    return null;
   }
 
-  async list({ namespace = "" } = {}, query?: IKubeApiQueryParams): Promise<T[]> {
+  async list({ namespace = "" } = {}, query?: IKubeApiQueryParams): Promise<T[] | null> {
     await this.checkPreferredVersion();
 
-    return this.request
-      .get(this.getUrl({ namespace }), { query })
-      .then(data => this.parseResponse(data, namespace));
+    const res = await this.request.get(this.getUrl({ namespace }), { query });
+    const parsed = this.parseResponse(res, namespace);
+
+    if (!parsed || !Array.isArray(parsed)) {
+      return null;
+    }
+
+    return parsed;
   }
 
-  async get({ name = "", namespace = "default" } = {}, query?: IKubeApiQueryParams): Promise<T> {
+  async get({ name = "", namespace = "default" } = {}, query?: IKubeApiQueryParams): Promise<T | null> {
     await this.checkPreferredVersion();
 
-    return this.request
-      .get(this.getUrl({ namespace, name }), { query })
-      .then(this.parseResponse);
+    const res = await this.request.get(this.getUrl({ namespace, name }), { query });
+
+    const parsed = this.parseResponse(res);
+
+    if (Array.isArray(parsed)) {
+      return null;
+    }
+
+    return parsed;
   }
 
-  async create({ name = "", namespace = "default" } = {}, data?: Partial<T>): Promise<T> {
+  async create({ name = "", namespace = "default" } = {}, data?: Partial<T>): Promise<T | null> {
     await this.checkPreferredVersion();
     const apiUrl = this.getUrl({ namespace });
 
-    return this.request
-      .post(apiUrl, {
-        data: merge({
-          kind: this.kind,
-          apiVersion: this.apiVersionWithGroup,
-          metadata: {
-            name,
-            namespace
-          }
-        }, data)
-      })
-      .then(this.parseResponse);
+    const res = this.request.post(apiUrl, {
+      data: merge({
+        kind: this.kind,
+        apiVersion: this.apiVersionWithGroup,
+        metadata: {
+          name,
+          namespace
+        }
+      }, data)
+    });
+    const parsed = this.parseResponse(res);
+
+    if (Array.isArray(parsed)) {
+      return null;
+    }
+
+    return parsed;
   }
 
-  async update({ name = "", namespace = "default" } = {}, data?: Partial<T>): Promise<T> {
+  async update({ name = "", namespace = "default" } = {}, data?: Partial<T>): Promise<T | null> {
     await this.checkPreferredVersion();
     const apiUrl = this.getUrl({ namespace, name });
 
-    return this.request
-      .put(apiUrl, { data })
-      .then(this.parseResponse);
+    const res = await this.request.put(apiUrl, { data });
+    const parsed = this.parseResponse(res);
+
+    if (Array.isArray(parsed)) {
+      return null;
+    }
+
+    return parsed;
   }
 
   async delete({ name = "", namespace = "default" }) {

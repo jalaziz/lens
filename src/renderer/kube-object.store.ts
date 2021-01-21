@@ -89,7 +89,7 @@ export abstract class KubeObjectStore<T extends KubeObject = any> extends ItemSt
       if (api.isNamespaced) {
         return Promise
           .all(namespaces.map(namespace => api.list({ namespace })))
-          .then(items => items.flat());
+          .then(items => items.flat().filter(Boolean));
       }
 
       return api.list({}, this.query);

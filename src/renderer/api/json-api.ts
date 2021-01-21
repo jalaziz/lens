@@ -2,7 +2,6 @@
 
 import { stringify } from "querystring";
 import { EventEmitter } from "../../common/event-emitter";
-import { cancelableFetch } from "../utils/cancelableFetch";
 
 export interface JsonApiData {
 }
@@ -71,7 +70,7 @@ export class JsonApi<D = JsonApiData, P extends JsonApiParams = JsonApiParams> {
     return this.request<T>(path, params, { ...reqInit, method: "delete" });
   }
 
-  protected request<D>(path: string, params?: P, init: RequestInit = {}) {
+  protected async request<D>(path: string, params?: P, init: RequestInit = {}) {
     let reqUrl = this.config.apiBase + path;
     const reqInit: RequestInit = { ...this.reqInit, ...init };
     const { data, query } = params || {} as P;
@@ -91,9 +90,9 @@ export class JsonApi<D = JsonApiData, P extends JsonApiParams = JsonApiParams> {
       reqInit,
     };
 
-    return cancelableFetch(reqUrl, reqInit).then(res => {
-      return this.parseResponse<D>(res, infoLog);
-    });
+    const res = await fetch(reqUrl, reqInit);
+
+    return this.parseResponse<D>(res, infoLog);
   }
 
   protected parseResponse<D>(res: Response, log: JsonApiLog): Promise<D> {
