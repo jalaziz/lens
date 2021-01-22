@@ -27,6 +27,14 @@ export abstract class ItemStore<T extends ItemObject = ItemObject> {
     return this.items.find(item => item.getName() === name);
   }
 
+  /**
+   * Return `items` sorted by the given ordering functions. If two elements of
+   * `items` are sorted to the same "index" then the next sorting function is used
+   * to determine where to place them relative to each other.
+   * @param items the items to be sorted (default: the current items in this store)
+   * @param sorting list of functions to determine sort order (default: sorting by name)
+   * @param order whether to sort from least to greatest (`"asc"`) or vice-versa (`"desc"`)
+   */
   @action
   protected sortItems(items: T[] = this.items, sorting: ((item: T) => any)[] = [this.defaultSorting], order?: "asc" | "desc"): T[] {
     return orderBy(items, sorting, order);

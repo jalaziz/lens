@@ -55,10 +55,8 @@ describe("KubeObject", () => {
         ["metadata.finalizers", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", finalizers: [1] } }],
         ["metadata.finalizers", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", finalizers: {} } }],
         ["metadata.labels", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", labels: 1 } }],
-        ["metadata.labels", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", labels: [] } }],
         ["metadata.labels", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", labels: { food: 1 } } }],
         ["metadata.annotations", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", annotations: 1 } }],
-        ["metadata.annotations", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", annotations: [] } }],
         ["metadata.annotations", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", annotations: { food: 1 } } }],
       ];
 
@@ -141,10 +139,8 @@ describe("KubeObject", () => {
         ["metadata.finalizers", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", finalizers: [1] } }],
         ["metadata.finalizers", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", finalizers: {} } }],
         ["metadata.labels", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", labels: 1 } }],
-        ["metadata.labels", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", labels: [] } }],
         ["metadata.labels", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", labels: { food: 1 } } }],
         ["metadata.annotations", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", annotations: 1 } }],
-        ["metadata.annotations", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", annotations: [] } }],
         ["metadata.annotations", { kind: "", apiVersion: "", metadata: { uid: "", name: "", resourceVersion: "", selfLink: "", annotations: { food: 1 } } }],
       ];
 
