@@ -80,7 +80,7 @@ export function isObject(val: unknown): val is object {
  * Creates a new predicate function (with the same predicate) from `fn`. Such
  * that it can be called with just the value to be tested.
  *
- * This is useful for when use `hasOptionalProperty` and `hasTypedProperty`
+ * This is useful for when using `hasOptionalProperty` and `hasTypedProperty`
  * @param fn A typescript user predicate function to be bound
  * @param boundArgs the set of arguments to be passed to `fn` in the new function
  */
