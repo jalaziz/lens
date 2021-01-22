@@ -11,11 +11,13 @@ import { Notifications } from "./components/notifications";
 import { ConfirmDialog } from "./components/confirm-dialog";
 import { extensionLoader } from "../extensions/extension-loader";
 import { broadcastMessage } from "../common/ipc";
+import { LensProtocolRouterRenderer } from "./protocol-handler/router";
 
 @observer
 export class LensApp extends React.Component {
   static async init() {
     extensionLoader.loadOnClusterManagerRenderer();
+    LensProtocolRouterRenderer.getInstance<LensProtocolRouterRenderer>().init();
     window.addEventListener("offline", () => {
       broadcastMessage("network:offline");
     });
